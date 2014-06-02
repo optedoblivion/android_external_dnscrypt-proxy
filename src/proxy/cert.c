@@ -1,4 +1,8 @@
 
+#ifndef USE_LDNS_FOR_RESOLUTION
+# define USE_LDNS_FOR_RESOLUTION 1
+#endif
+
 #include <config.h>
 #include <sys/types.h>
 #ifdef _WIN32
@@ -19,6 +23,9 @@
 #include <event2/event.h>
 
 #include <sodium.h>
+#ifdef USE_LDNS_FOR_RESOLUTION
+# include <ldns/ldns.h>
+#endif
 
 #include "cert.h"
 #include "cert_p.h"
@@ -372,6 +379,65 @@ cert_updater_init(ProxyContext * const proxy_context)
     return 0;
 }
 
+#ifdef USE_LDNS_FOR_RESOLUTION
+static int
+resolve_using_ldns(const char * const provider_name,
+                   ProxyContext * const proxy_context)
+{
+    struct txt_record txt_records[100];    
+    ldns_pkt      *packet;
+    ldns_rdf      *answer_rdf;
+    ldns_rdf      *query_entry;
+    ldns_rdf      *resolver_entry;
+    ldns_resolver *resolver;
+    ldns_rr       *answer;
+    ldns_rr_list  *answers;
+    size_t         answers_count;
+    size_t         i;
+    size_t         j;
+
+    resolver_entry = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_A, "208.67.222.222");
+    query_entry = ldns_dname_new_frm_str(provider_name);
+    resolver = ldns_resolver_new();
+    ldns_resolver_push_nameserver(resolver, resolver_entry);
+    ldns_resolver_set_usevc(resolver, 1);
+    ldns_resolver_set_fallback(resolver, 1);
+
+    packet = ldns_resolver_search(resolver, query_entry,
+                                  LDNS_RR_TYPE_TXT, LDNS_RR_CLASS_IN, LDNS_RD);
+    if (packet == NULL) {
+        ldns_resolver_deep_free(resolver);        
+        return -1;
+    }
+    answers = ldns_pkt_answer(packet);
+    answers_count = ldns_rr_list_rr_count(answers);
+    if (answers_count > (sizeof txt_records / sizeof txt_records[0])) {
+        answers_count = sizeof txt_records / sizeof txt_records[0];
+    }
+    j = 0;
+    for (i = (size_t) 0U; i < answers_count; i++) {
+        answer = ldns_rr_list_rr(answers, i);
+        if (ldns_rr_get_type(answer) != LDNS_RR_TYPE_TXT) {
+            continue;
+        }
+        answer_rdf = ldns_rr_rdf(answer, 0);
+        if (ldns_rdf_size(answer_rdf) > 1U &&
+            ldns_rdf_size(answer_rdf) < sizeof txt_records[j].txt + 1U) {
+            txt_records[j].len = ldns_rdf_size(answer_rdf) - 1U;
+            memcpy(txt_records[j].txt, ldns_rdf_data(answer_rdf) + 1,
+                   txt_records[j].len);
+            j++;
+        }
+    }
+    ldns_pkt_free(packet);
+    ldns_resolver_deep_free(resolver);
+    
+    cert_query_cb(DNS_ERR_NONE, 0, j, 0, txt_records, proxy_context);
+
+    return 0;
+}
+#endif
+
 static int
 cert_updater_update(ProxyContext * const proxy_context)
 {
@@ -396,6 +462,12 @@ cert_updater_update(ProxyContext * const proxy_context)
         (void) evdns_base_nameserver_ip_add(cert_updater->evdns_base,
                                             proxy_context->resolver_ip);
     }
+#ifdef USE_LDNS_FOR_RESOLUTION
+    if (resolve_using_ldns(proxy_context->provider_name,
+                           proxy_context) != 0) {
+        return -1;
+    }
+#else
     if (evdns_base_resolve_txt(cert_updater->evdns_base,
                                proxy_context->provider_name,
                                DNS_QUERY_NO_SEARCH,
@@ -403,6 +475,7 @@ cert_updater_update(ProxyContext * const proxy_context)
                                proxy_context) == NULL) {
         return -1;
     }
+#endif
     return 0;
 }
 

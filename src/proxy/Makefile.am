@@ -52,6 +52,7 @@ AM_CPPFLAGS = \
 	-DPKGDATADIR='"${pkgdatadir}"'
 
 dnscrypt_proxy_LDADD = \
+	@LDNS_LIBS@ \
 	../libevent-modified/libevent_extra.la \
 	../libevent-modified/libevent_core.la
 
