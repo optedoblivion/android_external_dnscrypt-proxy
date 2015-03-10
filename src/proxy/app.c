@@ -319,7 +319,7 @@ dnscrypt_proxy_main(int argc, char *argv[])
         logger_noformat(NULL, LOG_ERR, "Unable to start the proxy");
         exit(1);
     }
-    logger_noformat(&proxy_context, LOG_NOTICE, "Starting " PACKAGE_STRING);
+    logger_noformat(&proxy_context, LOG_NOTICE, "Starting dnscrypt");
 #ifdef USE_ONLY_PORTABLE_IMPLEMENTATIONS
     randombytes_stir();
 #else

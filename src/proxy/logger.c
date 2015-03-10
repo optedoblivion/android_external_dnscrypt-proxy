@@ -24,7 +24,7 @@ logger_open_syslog(struct ProxyContext_ * const context)
 {
     assert(context->daemonize != 0);
 #ifndef _WIN32
-    openlog(PACKAGE_TARNAME, LOG_NDELAY | LOG_PID, LOG_DAEMON);
+    openlog("dnscrypt-proxy", LOG_NDELAY | LOG_PID, LOG_DAEMON);
 #endif
     return 0;
 }

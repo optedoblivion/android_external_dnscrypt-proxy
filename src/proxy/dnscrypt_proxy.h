@@ -43,7 +43,7 @@
 # ifdef _WIN32
 #  define DEFAULT_RESOLVERS_LIST "dnscrypt-resolvers.csv"
 # else
-#  define DEFAULT_RESOLVERS_LIST PKGDATADIR "/dnscrypt-resolvers.csv"
+#  define DEFAULT_RESOLVERS_LIST "/etc/dnscrypt-resolvers.csv"
 # endif
 #endif
 

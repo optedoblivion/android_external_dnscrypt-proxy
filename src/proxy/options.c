@@ -76,7 +76,7 @@ static const char *getopt_options = "a:e:hk:L:m:n:r:R:t:u:N:TVX";
 static void
 options_version(void)
 {
-    puts(PACKAGE_STRING);
+    puts("dnscrypt");
 }
 
 static void

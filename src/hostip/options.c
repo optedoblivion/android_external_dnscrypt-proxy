@@ -26,7 +26,7 @@ static const char   *getopt_options = "6hr:V";
 static void
 options_version(void)
 {
-    puts("hostip v" PACKAGE_VERSION);
+    puts("hostip v1");
 }
 
 static void
