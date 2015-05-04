@@ -4,8 +4,8 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := sodium
-LOCAL_SRC_FILES := ../../android-libsodium/libs/$(TARGET_ARCH_ABI)/libsodium.so
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../include/
+LOCAL_SRC_FILES := $(OUT)/system/lib/libsodium.so
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../libsodium/src/libsodium/include
 
 include $(PREBUILT_SHARED_LIBRARY)
 
@@ -59,7 +59,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/src/include/dnscrypt \
 	$(LOCAL_PATH)/src/libevent-modified/include \
 	$(LOCAL_PATH)/src/ext \
-	../android-libsodium/jni/src/libsodium/include
+	$(LOCAL_PATH)/../libsodium/src/libsodium/include
 
 LOCAL_CFLAGS := \
 	-std=gnu99 \
