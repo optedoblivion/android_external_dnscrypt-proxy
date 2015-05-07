@@ -75,3 +75,13 @@ LOCAL_MODULE_TAGS := eng
 LOCAL_STATIC_LIBRARIES += libsodium
 
 include $(BUILD_EXECUTABLE)
+
+#============== Copy Resolvers File ============
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := dnscrypt-resolvers.csv
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(TARGET_OUT_ETC)
+LOCAL_SRC_FILES := $(LOCAL_MODULE)
+include $(BUILD_PREBUILT)
