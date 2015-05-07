@@ -65,7 +65,7 @@ LOCAL_CFLAGS := \
 	-std=gnu99 \
 	-Werror=implicit
 
-CONFIG_DIR := /etc
+CONFIG_DIR := /system/etc
 
 LOCAL_CFLAGS += -DPKGDATADIR="\"$(CONFIG_DIR)\""
 
