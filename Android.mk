@@ -1,15 +1,5 @@
 LOCAL_PATH:= $(call my-dir)
 
-# prebuilt libsodium
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := sodium
-LOCAL_SRC_FILES := $(OUT)/system/lib/libsodium.so
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../libsodium/src/libsodium/include
-
-include $(PREBUILT_SHARED_LIBRARY)
-
-#========================== dnscrypt-proxy ====================
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := \
@@ -72,7 +62,7 @@ LOCAL_CFLAGS += -DPKGDATADIR="\"$(CONFIG_DIR)\""
 LOCAL_MODULE := dnscrypt-proxy
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
 LOCAL_MODULE_TAGS := eng
-LOCAL_STATIC_LIBRARIES += libsodium
+LOCAL_SHARED_LIBRARIES += libsodium
 
 include $(BUILD_EXECUTABLE)
 
